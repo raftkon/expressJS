@@ -1,0 +1,25 @@
+# AUTH
+### get current user
+GET http://localhost:8000/api/auth/current-user HTTP/1.1
+content-type: application/json
+
+### sign in
+POST http://localhost:8000/api/auth/sign-in HTTP/1.1
+content-type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "test"
+}
+### sign up
+POST http://localhost:8000/api/auth/sign-up HTTP/1.1
+content-type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "test"
+}
+### sign out
+POST http://localhost:8000/api/auth/sign-out HTTP/1.1
+content-type: application/json
+###
