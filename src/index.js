@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import "express-async-errors";
 import compression from "compression";
-import mongoose from "mongoose";
 import cookieSession from "cookie-session";
 import { config } from "dotenv";
 import { createServer } from "http";
@@ -10,13 +9,13 @@ import { createServer } from "http";
 import { authRouter } from "./routes/users.js";
 import { NotFoundError } from "./errors/not-found-error.js";
 import { errorHandler } from "./middlewares/error-handler.js";
-import { DatabaseConnectionError } from "./errors/database-connection-error.js";
+import { connectDB } from "./db/connection.js";
 
 config();
 const PORT = process.env.PORT || 8000;
 
 const app = express();
-const httpServer = createServer(app);
+const server = createServer(app);
 
 app.use(cors());
 app.use(compression());
@@ -32,7 +31,7 @@ app.use(
 app.use("/api/auth", authRouter);
 
 app.get("/", (req, res) => {
-  res.send("ok");
+  res.send("Application app and running");
 });
 
 app.all("*", () => {
@@ -42,14 +41,8 @@ app.all("*", () => {
 app.use(errorHandler);
 
 const start = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.log({ errorInDBConnection: error });
-    throw new DatabaseConnectionError();
-  }
-  httpServer.listen(PORT, () => {
+  connectDB();
+  server.listen(PORT, () => {
     console.log("Listening on port 8000");
   });
 };

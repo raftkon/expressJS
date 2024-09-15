@@ -7,6 +7,8 @@ export class Secure {
   /**
    * Encrypts given data. It is supposed to encrypt jwt token
    * inside the cookie containing user data for security reasons.
+   * @param {*} data
+   * @returns encryptedData
    */
   static encrypt(data) {
     // made by randomBytes(24).toString('hex')
@@ -21,6 +23,8 @@ export class Secure {
   /**
    * Decrypts given encrypted data. It is supposed to decrypt
    * the jwt token inside the cookie to retrieve user data.
+   * @param {String} encryptedData
+   * @returns {*} data
    */
   static decrypt(encryptedData) {
     const key = Buffer.from(process.env.ENCRYPTION_KEY, "hex");

@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: .
+    container_name: api
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 8000:8000
+    networks:
+      - express-js-docker
+  db:
+    image: mongo
+    container_name: db
+    ports:
+      - 27017:27017
+    networks:
+      - express-js-docker
+
+networks:
+  express-js-docker:
+    driver: bridge

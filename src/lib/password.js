@@ -8,11 +8,12 @@ import { promisify } from "util";
  */
 const scryptAsync = promisify(scrypt);
 
+// * Static methods are methods that we can access without creating an instance of the class.
 export class Password {
   /**
-   * Static methods are methods that we
-   * can access without creating an instance
-   * of the class.
+   * Hashes the given password using a random salt and returns the hashed password
+   * @param {String} password
+   * @returns {String} hashedPassword
    */
   static async toHash(password) {
     const salt = randomBytes(8).toString("hex");
@@ -20,6 +21,13 @@ export class Password {
     return `${buffer.toString("hex")}.${salt}`;
   }
 
+  /**
+   * Hashes the supplied password and compares it to the stored hashed password.
+   * Returns true if the passwords match
+   * @param {String} storedPassword
+   * @param {String} suppliedPassword
+   * @returns boolean
+   */
   static async compare(storedPassword, suppliedPassword) {
     const [hashedPassword, salt] = storedPassword.split(".");
     const buffer = await scryptAsync(suppliedPassword, salt, 64);
