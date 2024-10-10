@@ -1,5 +1,8 @@
 import { CustomError } from "./custom-error.js";
 
+/**
+ * RequestValidationError class is used to prettify any errors regarding the express-validator package in `validate-request.js` middleware.
+ */
 export class RequestValidationError extends CustomError {
   constructor(errors) {
     super(400, "Invalid request parameters");

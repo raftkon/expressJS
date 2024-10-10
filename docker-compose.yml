@@ -3,21 +3,29 @@ services:
     build:
       context: .
     container_name: api
-    volumes:
-      - ./:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
       - 8000:8000
+    env_file:
+      - .env
     networks:
       - express-js-docker
   db:
     image: mongo
     container_name: db
-    ports:
-      - 27017:27017
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+      - mongo_configdb:/data/configdb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: adminpassword
+    expose:
+      - "27017"
     networks:
       - express-js-docker
 
 networks:
   express-js-docker:
-    driver: bridge
+volumes:
+  mongo_data:
+  mongo_configdb:

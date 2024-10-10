@@ -9,16 +9,27 @@ services:
     ports:
       - 8000:8000
     command: npm run dev
+    env_file:
+      - .env
     networks:
       - express-js-docker
   db:
     image: mongo
     container_name: db
-    ports:
-      - 27017:27017
+    expose:
+      - "27017"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: adminpassword
+    volumes:
+      - mongo_data_dev:/data/db
+      - mongo_configdb_dev:/data/configdb
     networks:
       - express-js-docker
 
 networks:
   express-js-docker:
-    driver: bridge
+volumes:
+  mongo_data_dev:
+  mongo_configdb_dev:

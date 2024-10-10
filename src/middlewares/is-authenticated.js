@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import { Secure } from "../lib/secure.js";
-import { NotAuthorizedError } from "../errors/not-authorized-error.js";
-import { CustomError } from "../errors/custom-error.js";
+import { CustomError } from "../lib/custom-error.js";
 
 /**
  * It is used to protect routes.
@@ -13,7 +12,7 @@ import { CustomError } from "../errors/custom-error.js";
 export const isAuthenticated = (req, res, next) => {
   const { jwt: jwtToken } = req.session;
   if (!jwtToken) {
-    throw new NotAuthorizedError();
+    throw new CustomError(401, "Not authorized");
   }
   try {
     const data = Secure.decrypt(jwtToken);

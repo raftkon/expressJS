@@ -1,0 +1,6 @@
+.env
+node_modules
+dev.sh
+prod.sh
+docker-compose.yml
+compose.dev.yml

@@ -1,4 +1,4 @@
-import { CustomError } from "../errors/custom-error.js";
+import { CustomError } from "../lib/custom-error.js";
 
 export const errorHandler = (err, req, res, next) => {
   if (err instanceof CustomError) {
@@ -8,7 +8,7 @@ export const errorHandler = (err, req, res, next) => {
   res.status(400).send({
     errors: [
       {
-        message: "Something went wrong",
+        msg: "Something went wrong",
       },
     ],
   });

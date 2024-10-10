@@ -1,1 +1,0 @@
-docker compose -p project-name -f docker-compose.dev.yml up -d && docker compose -p project-name logs -f
