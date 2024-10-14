@@ -27,7 +27,48 @@ services:
       - mongo_configdb_dev:/data/configdb
     networks:
       - express-js-docker
+  zookeeper:
+    image: zookeeper:3.9
+    # image: wurstmeister/zookeeper:latest
+    container_name: zookeeper
+    restart: always
+    volumes:
+      - zookeeper_data:/data
+      - zookeeper_logs:/logs
+      - zookeeper_datalog:/datalog
+    expose:
+      - "2181"
+    networks:
+      - express-js-docker
 
+  kafka:
+    image: wurstmeister/kafka:2.13-2.8.1
+    container_name: broker
+    restart: always
+    volumes:
+      - kafka_data:/kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: "SSL://147.79.117.20:9093"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "SSL:SSL"
+      KAFKA_LISTENERS: "SSL://0.0.0.0:9093"
+      KAFKA_SSL_KEYSTORE_LOCATION: "/etc/kafka/secrets/kafka.server.keystore.jks"
+      KAFKA_SSL_KEYSTORE_PASSWORD: "pass123"
+      KAFKA_SSL_KEY_PASSWORD: "pass123"
+      KAFKA_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/kafka.server.truststore.jks"
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: "pass123"
+      # KAFKA_ADVERTISED_LISTENERS: INSIDE://symbiotik-kafka:9092,OUTSIDE://symbiotik.aegisresearch.eu:9093 # SERVER: change "OUTSIDE://localhost:9093" -> "OUTSIDE://148.251.44.114:9093"
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      # KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
+      # KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      # KAFKA_ZOOKEEPER_CONNECT: "symbiotik-zookeeper:2181" # Connect to the Zookeeper service
+      # ALLOW_PLAINTEXT_LISTENER: YES
+    networks:
+      - express-js-docker
+    depends_on:
+      - zookeeper # Ensure Zookeeper starts before Kafka
 networks:
   express-js-docker:
 volumes:
