@@ -23,7 +23,8 @@ app.use(express.json());
 
 app.use("/products", productsRouter);
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  await KafkaManager.produce(process.env.KAFKA_TOPIC,[{key:"I am a key",value:JSON.stringify({al:"ekos"})}])
   res.send("Application app and running");
 });
 
@@ -40,6 +41,13 @@ const start = async () => {
     process.env.KAFKA_BROKER,
   ]);
 
+  const kafkaTopics = await KafkaManager.listTopics()
+  const topicExists = kafkaTopics.includes(process.env.KAFKA_TOPIC)
+
+  if (!topicExists) {
+    await KafkaManager.createTopic(process.env.KAFKA_TOPIC)
+  }
+  
   const consumer = KafkaManager.createConsumer(
     process.env.KAFKA_GROUP_ID,
     process.env.KAFKA_TOPIC,
@@ -47,7 +55,7 @@ const start = async () => {
       const data = {
         message: {
           key: msg.key ? msg.key.toString() : "no-key",
-          value: JSON.parse(msg.value.toString()),
+          value: msg.value.toString(),
         },
       };
       console.log("🚀 ~ data:", data);

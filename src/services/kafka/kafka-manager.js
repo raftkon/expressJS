@@ -50,7 +50,7 @@ export class KafkaManager {
 
     await consumer.connect();
     await consumer.subscribe({ topic, fromBeginning: true });
-
+    console.log(`Consuming messages on topic: ${topic}`)
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         try {

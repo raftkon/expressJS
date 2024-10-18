@@ -35,7 +35,7 @@ services:
     volumes:
       - zookeeper_data:/data
       - zookeeper_logs:/logs
-      - zookeeper_datalog:/datalog
+    #   - zookeeper_datalog:/datalog
     expose:
       - "2181"
     networks:
@@ -47,23 +47,50 @@ services:
     restart: always
     volumes:
       - kafka_data:/kafka
+      - ./certs:/etc/kafka/secrets
+    expose:
+      - "9092"
     ports:
-      - "9092:9092"
+      # - "9092:9092"
       - "9093:9093"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: "SSL://147.79.117.20:9093"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "SSL:SSL"
-      KAFKA_LISTENERS: "SSL://0.0.0.0:9093"
-      KAFKA_SSL_KEYSTORE_LOCATION: "/etc/kafka/secrets/kafka.server.keystore.jks"
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181" # Connect to the Zookeeper service
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://broker:9092,OUTSIDE://zamanfu.fun:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:SSL
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      
+      KAFKA_SSL_KEYSTORE_LOCATION: "/etc/kafka/secrets/kafka-keystore.p12"
       KAFKA_SSL_KEYSTORE_PASSWORD: "pass123"
       KAFKA_SSL_KEY_PASSWORD: "pass123"
-      KAFKA_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/kafka.server.truststore.jks"
+      KAFKA_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/kafka-trustore.p12"
       KAFKA_SSL_TRUSTSTORE_PASSWORD: "pass123"
-      # KAFKA_ADVERTISED_LISTENERS: INSIDE://symbiotik-kafka:9092,OUTSIDE://symbiotik.aegisresearch.eu:9093 # SERVER: change "OUTSIDE://localhost:9093" -> "OUTSIDE://148.251.44.114:9093"
+      KAFKA_SSL_ENABLED_PROTOCOLS: TLSv1.2,TLSv1.1,TLSv1
+
+      KAFKA_SSL_CLIENT_AUTH: "required"
+      
+      # ! CORRECT SSL CONFIGURATION 
+      # KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
+      # KAFKA_SSL_KEYSTORE_LOCATION: "/etc/kafka/secrets/kafka-keystore.jks"
+      # KAFKA_SSL_KEYSTORE_PASSWORD: "kafkapass"
+      # KAFKA_SSL_KEY_PASSWORD: "kafkapass"
+      # KAFKA_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/kafka-trustore.jks"
+      # KAFKA_SSL_TRUSTSTORE_PASSWORD: "kafkapass"
+      # KAFKA_SSL_ENABLED_PROTOCOLS: TLSv1.2,TLSv1.1,TLSv1
+
+
+      # ! CONFIGURATION FOR PLAINTEXT COMMUNICATION
+      # KAFKA_BROKER_ID: 1
+      # KAFKA_REPLICATION_FACTOR: 1
+      # KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093 
+      # KAFKA_ADVERTISED_LISTENERS: INSIDE://broker:9092,OUTSIDE://zamanfu.fun:9093 # SERVER: change "OUTSIDE://localhost:9093" -> "OUTSIDE://148.251.44.114:9093"
       # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      # KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
       # KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      # KAFKA_ZOOKEEPER_CONNECT: "symbiotik-zookeeper:2181" # Connect to the Zookeeper service
+      # KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181" # Connect to the Zookeeper service
       # ALLOW_PLAINTEXT_LISTENER: YES
     networks:
       - express-js-docker
@@ -74,3 +101,6 @@ networks:
 volumes:
   mongo_data_dev:
   mongo_configdb_dev:
+  kafka_data:
+  zookeeper_data:
+  zookeeper_logs:
